@@ -1,6 +1,8 @@
 from flask import *
 from janome.tokenizer import Tokenizer
 from flask_cors import CORS
+from github import GitHubApi
+import collections
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
@@ -30,10 +32,32 @@ def sent_analysis():
     for token in tokens:
         # 品詞を取り出し
         partOfSpeech = token.part_of_speech.split(',')[0]
-    
+
         if partOfSpeech == u'名詞':
             result.append(token.surface)
 
     return jsonify(result)
+
+@app.route("/git_extract", methods=["POST"])
+def sent_extract():
+    api = GitHubApi()
+
+    gitname = request.json["gitname"]
+
+    repos = api.get_user_repos(gitname)
+    langs = []
+
+    for repo in repos:
+        langs.append(repo['language'])
+
+    c = collections.Counter(langs)
+    langs_setted = set(langs)
+    length = len(langs)
+
+    for i in langs_setted:
+        per = round((c[i] / length) * 100, 1)
+        c.update({i: per})
+
+    return jsonify(list(c.items()))
 
 app.run(port=8080, debug=True)
