@@ -1,5 +1,6 @@
 from flask import *
-import MeCab
+from janome.tokenizer import Tokenizer
+
 app = Flask(__name__, static_folder='.', static_url_path='')
 @app.route('/')
 def index():
@@ -15,16 +16,17 @@ def login_manager():
 @app.route("/sent_analysis", methods=["POST"])
 def sent_analysis():
     text = request.json["apeal"]
-    m = MeCab.Tagger()
 
-    nouns = [line for line in m.parse(text).splitlines()
-                if "名詞" in line.split()[-1]]
+    t = Tokenizer()
+    tokens = t.tokenize(text)
+    result = []
+    for token in tokens:
+        # 品詞を取り出し
+        partOfSpeech = token.part_of_speech.split(',')[0]
+    
+        if partOfSpeech == u'名詞':
+            result.append(token.surface)
 
-    noun = []
-    for str in nouns:
-        result = str.split()
-        noun.add(result[0])
-
-    return jsonify(noun)
+    return jsonify(result)
 
 app.run(port=8000, debug=True)
