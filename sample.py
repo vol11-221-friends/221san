@@ -1,11 +1,18 @@
 from flask import *
 from janome.tokenizer import Tokenizer
+from flask_cors import CORS
 
 app = Flask(__name__, static_folder='.', static_url_path='')
+CORS(app)
 @app.route('/')
 def index():
     # return app.send_static_file('index.html')
     return 'Hello world'
+
+@app.route('/', methods=["POST"])
+def main_process():
+    # return app.send_static_file('index.html')
+    return jsonify({"received_appeal": request.json["appeal"], "received_git_name": request.json["gitname"], "point": 100})
 
 @app.route("/login_manager", methods=["POST"])  #追加
 def login_manager():
@@ -15,7 +22,7 @@ def login_manager():
 
 @app.route("/sent_analysis", methods=["POST"])
 def sent_analysis():
-    text = request.json["apeal"]
+    text = request.json["appeal"]
 
     t = Tokenizer()
     tokens = t.tokenize(text)
@@ -29,4 +36,4 @@ def sent_analysis():
 
     return jsonify(result)
 
-app.run(port=8000, debug=True)
+app.run(port=8080, debug=True)
