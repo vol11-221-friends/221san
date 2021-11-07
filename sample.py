@@ -3,13 +3,19 @@ from janome.tokenizer import Tokenizer
 from flask_cors import CORS
 from github import GitHubApi
 import collections
+import gensim
+from gensim.models import KeyedVectors
+
+model_dir = './entity_vector.model.bin'
+model = KeyedVectors.load_word2vec_format(model_dir, binary=True)
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 @app.route('/')
 def index():
     # return app.send_static_file('index.html')
-    return 'Hello world'
+    return str(model.similarity('自然言語処理', '自然言語処理'))
+    # return str(model.most_similar("自然言語処理"))
 
 @app.route('/', methods=["POST"])
 def main_process():
