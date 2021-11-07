@@ -1,28 +1,25 @@
-from github import GitHubApi
-import collections
+import csv
+import pprint
+import numpy as np
 
-api = GitHubApi()
+with open('ProLanguages.csv',encoding = "utf-8-sig") as f:
+    reader = csv.reader(f)
+    l = [row for row in reader]
 
-a = 'maku77'
+words = ['C', 'みかん', 'python', 'トマト', 'java', 'レタス', 'りんご']
 
-# ユーザー情報を取得
-user = api.get_user(a)
-print(user['login'])
+result = []
+for i in range(len(l)):
+    for j in range(len(words)):
+        if words[j].lower() == l[i][0].lower():
+            result.append(l[i])
 
-repos = api.get_user_repos('maku77')
-langs = []
+final = []
+for i in range(len(result)):
+    temp = result[i]
+    temp.pop(0)
+    final.append(temp)
 
-for repo in repos:
-    # print(repo['language'])
-    langs.append(repo['language'])
 
-c = collections.Counter(langs)
-
-langs_setted = set(langs)
-length = len(langs)
-
-for i in langs_setted:
-    per = round((c[i] / length) * 100, 1)
-    c.update({i: per})
-
-print(type(c))
+print(result)
+print(final)

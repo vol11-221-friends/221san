@@ -3,6 +3,9 @@ from janome.tokenizer import Tokenizer
 from flask_cors import CORS
 from github import GitHubApi
 import collections
+import csv
+import pprint
+import numpy as np
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
@@ -36,7 +39,17 @@ def sent_analysis():
         if partOfSpeech == u'名詞':
             result.append(token.surface)
 
-    return jsonify(result)
+    with open('ProLanguages.csv',encoding = "utf-8-sig") as f:
+        reader = csv.reader(f)
+        l = [row for row in reader]
+
+    temp = []
+    for i in range(len(l)):
+        for j in range(len(result)):
+            if result[j].lower() == l[i][0].lower():
+                temp.append(l[i])
+
+    return jsonify({"response":temp})
 
 @app.route("/git_extract", methods=["POST"])
 def sent_extract():
@@ -58,6 +71,20 @@ def sent_extract():
         per = round((c[i] / length) * 100, 1)
         c.update({i: per})
 
-    return jsonify(list(c.items()))
+
+    result = list(langs_setted)
+
+    with open('ProLanguages.csv',encoding = "utf-8-sig") as f:
+        reader = csv.reader(f)
+        l = [row for row in reader]
+
+    temp = []
+    for i in range(len(l)):
+        for j in range(len(result)):
+            if result[j] is not None:
+                if result[j].lower() == l[i][0].lower():
+                    temp.append(l[i])
+
+    return jsonify({"a": list(c.items()), "b": list(set(langs)), "response":list(temp)})
 
 app.run(port=8080, debug=True)
