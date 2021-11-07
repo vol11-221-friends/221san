@@ -85,6 +85,42 @@ def sent_extract():
                 if result[j].lower() == l[i][0].lower():
                     temp.append(l[i])
 
-    return jsonify({"a": list(c.items()), "b": list(set(langs)), "response":list(temp)})
+    text = request.json["appeal"]
+
+    t = Tokenizer()
+    tokens = t.tokenize(text)
+    noun = []
+    for token in tokens:
+        # 品詞を取り出し
+        partOfSpeech = token.part_of_speech.split(',')[0]
+
+        if partOfSpeech == u'名詞':
+            noun.append(token.surface)
+    
+    exists_count = {}
+    word_exist = []
+    # tempの行を回すfor文
+    for i in range(len(temp)):
+        box = temp[i]
+
+        #　word_existの行成分
+        detected_words = []
+
+        #　boxの中身を回すfor文
+        for j in range(len(box)):
+
+            #　最初はプログラミング言語が入る
+            if j == 0:
+                detected_words.append(box[0])
+            else:
+                candidate = box[j]
+                for k in range(len(noun)):
+                    if noun[k] == candidate:
+                        detected_words.append(candidate)
+        
+        exists_count.setdefault(detected_words[0], len(detected_words))
+        word_exist.append(detected_words)    
+
+    return jsonify({"lang_itemized": list(c.items()), "b": list(set(langs)), "response":list(temp), "exist": exists_count})
 
 app.run(port=8080, debug=True)
