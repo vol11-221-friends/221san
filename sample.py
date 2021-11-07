@@ -81,7 +81,7 @@ def main_process():
                 for k in range(len(noun)):
                     if noun[k] == candidate:
                         detected_words.append(candidate)
-        
+
         exists_count.setdefault(detected_words[0], len(detected_words))
         word_exist.append(detected_words)
 
@@ -92,7 +92,7 @@ def main_process():
     for i in range(len(c_listed)):
         if c_listed[i][0] is not None:
             if exists_count[c_listed[i][0]] is not None:
-                score = score + c_listed[i][1] * exists_count[c_listed[i][0]]
+                score = score + c_listed[i][1] * (exists_count[c_listed[i][0]]-1)
 
     # return app.send_static_file('index.html')
     return jsonify({"received_appeal": request.json["appeal"], "received_git_name": request.json["gitname"], "point": int(score)})
