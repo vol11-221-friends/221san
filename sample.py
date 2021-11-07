@@ -91,9 +91,9 @@ def main_process():
 
     for i in range(len(c_listed)):
         if c_listed[i][0] is not None:
-            score = score + c_listed[i][1] * exists_count[c_listed[i][0]]
+            if exists_count[c_listed[i][0]] is not None:
+                score = score + c_listed[i][1] * exists_count[c_listed[i][0]]
 
-    
     # return app.send_static_file('index.html')
     return jsonify({"received_appeal": request.json["appeal"], "received_git_name": request.json["gitname"], "point": int(score)})
 
